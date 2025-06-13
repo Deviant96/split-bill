@@ -15,10 +15,15 @@ if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Database connection failed: ' . $conn->connect_error]));
 }
 
+$billTitle = isset($data['billTitle']) ? $data['billTitle'] : 'Untitled Bill';
+$billDate = isset($data['billDate']) ? $data['billDate'] : date('Y-m-d');
+
 // Create tables if they don't exist
 $createTables = "
 CREATE TABLE IF NOT EXISTS calculations (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    bill_date DATE NOT NULL,
     total_bill DECIMAL(10,2) NOT NULL,
     total_discounts DECIMAL(10,2) NOT NULL,
     total_extras DECIMAL(10,2) NOT NULL,
@@ -72,8 +77,8 @@ try {
     $conn->begin_transaction();
 
     // Insert calculation
-    $stmt = $conn->prepare("INSERT INTO calculations (total_bill, total_discounts, total_extras, final_total) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("dddd", $totalBill, $totalDiscount, $totalExtra, $finalTotal);
+    $stmt = $conn->prepare("INSERT INTO calculations (title, bill_date, total_bill, total_discounts, total_extras, final_total) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssdddd", $billTitle, $billDate, $totalBill, $totalDiscount, $totalExtra, $finalTotal);
     $stmt->execute();
     $calculationId = $conn->insert_id;
     $stmt->close();

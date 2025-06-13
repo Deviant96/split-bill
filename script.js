@@ -17,6 +17,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const resultsSection = document.getElementById('results');
     const summaryResults = document.getElementById('summaryResults');
     const individualResults = document.getElementById('individualResults');
+    const billTitleInput = document.getElementById('billTitle');
+    const billDateInput = document.getElementById('billDate');
+    const displayTitle = document.getElementById('displayTitle');
+    const displayDate = document.getElementById('displayDate');
+    const detailedViewBtn = document.getElementById('detailedView');
+    const compactViewBtn = document.getElementById('compactView');
+
+    // Set default date to today
+    billDateInput.valueAsDate = new Date();
+
+    // View toggle functionality
+    detailedViewBtn.addEventListener('click', function() {
+        individualResults.classList.remove('compact-view');
+        detailedViewBtn.classList.add('active');
+        compactViewBtn.classList.remove('active');
+    });
+
+    compactViewBtn.addEventListener('click', function() {
+        individualResults.classList.add('compact-view');
+        compactViewBtn.classList.add('active');
+        detailedViewBtn.classList.remove('active');
+    });
 
     // Add discount field
     addDiscountBtn.addEventListener('click', function() {
@@ -110,6 +132,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Main calculation function
     function calculateSplit() {
+        // Set bill title and date in results
+        displayTitle.textContent = billTitleInput.value || 'Tagihan Tanpa Judul';
+        
+        const billDate = new Date(billDateInput.value);
+        displayDate.textContent = billDate.toLocaleDateString('id-ID', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        }) || new Date().toLocaleDateString('id-ID');
+
         const totalBill = calculateTotalBill();
         
         // Get all discounts
@@ -154,8 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Calculate each person's share
         const peopleWithShares = people.map(person => {
             const share = totalPersonAmount > 0 ? 
-                (person.amount / totalPersonAmount) * adjustedTotal : 
-                adjustedTotal / people.length;
+                Math.ceil((person.amount / totalPersonAmount) * adjustedTotal / 1000) * 1000 : 
+                Math.ceil((adjustedTotal / people.length / 1000)) * 1000;
             return {
                 name: person.name,
                 amount: person.amount,
@@ -190,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function formatRupiah(amount) {
-        return 'Rp' + amount.toLocaleString('id-ID');
+        return 'Rp' + Math.round(amount).toLocaleString('id-ID');
     }
 
     // Display results function

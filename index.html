@@ -18,6 +18,16 @@
         <div class="app-container">
             <div class="input-section">
                 <div class="form-group">
+                    <label for="billTitle">Judul Tagihan</label>
+                    <input type="text" id="billTitle" placeholder="Misal: Makan Bareng di Resto A">
+                </div>
+
+                <div class="form-group">
+                    <label for="billDate">Tanggal</label>
+                    <input type="date" id="billDate">
+                </div>
+
+                <div class="form-group">
                     <label>Total Kontribusi</label>
                     <div id="totalBillDisplay" class="total-display">Rp0</div>
                 </div>
@@ -41,10 +51,21 @@
             </div>
 
             <div class="result-section" id="results" style="display: none;">
-                <h2><i class="fas fa-chart-pie"></i> Bill Summary</h2>
+                <div class="bill-header" id="billHeader">
+                    <h2 id="displayTitle"></h2>
+                    <p id="displayDate"></p>
+                </div>
+
+                <div class="view-toggle">
+                    <button id="detailedView" class="btn-toggle active"><i class="fas fa-list"></i> Detail</button>
+                    <button id="compactView" class="btn-toggle"><i class="fas fa-th-large"></i> Ringkas</button>
+                </div>
+
+
+                <h3><i class="fas fa-chart-pie"></i> Bill Summary</h3>
                 <div id="summaryResults"></div>
                 
-                <h2><i class="fas fa-user-friends"></i> Individual Shares</h2>
+                <h3><i class="fas fa-user-friends"></i> Individual Shares</h3>
                 <div id="individualResults"></div>
                 
                 <button id="saveBtn" class="btn-secondary"><i class="fas fa-save"></i> Save Calculation</button>

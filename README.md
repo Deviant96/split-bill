@@ -40,3 +40,9 @@ A simple web application to split bills among friends with discounts and extra e
    2. Show all ammounts in proper Rupiah format
    3. Provide suggestions for common discount types, extra expenses, and people names
    4. Display all text in Bahasa
+
+### Update 2
+   1. Allow naming bills and setting dates
+   2. Round up amounts to the nearest 1000 (common practice in Indonesia)
+   3. Switch between detailed and compact views
+   4. Display information more clearly in the results
