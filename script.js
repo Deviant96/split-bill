@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const commonDiscounts = ["Diskon Member", "Promo Akhir Tahun", "Voucher", "Cashback"];
+    const commonExtras = ["Service Charge", "Pajak", "Tips", "Ongkir"];
+    const commonPeople = ["Andi", "Budi", "Cindy", "Dedi"];
+
     // DOM Elements
     const totalBillInput = document.getElementById('totalBill');
     const discountsContainer = document.getElementById('discountsContainer');
@@ -29,9 +33,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const personId = Date.now();
         const personDiv = document.createElement('div');
         personDiv.className = 'person-item';
+        
+        // Create datalist for people suggestions
+        const datalistId = `person-suggestions-${personId}`;
+        let datalistHTML = `<datalist id="${datalistId}">`;
+        commonPeople.forEach(person => {
+            datalistHTML += `<option value="${person}">`;
+        });
+        datalistHTML += '</datalist>';
+        
         personDiv.innerHTML = `
-            <input type="text" class="person-name" placeholder="Person name" required>
-            <input type="number" class="person-amount" placeholder="Amount" min="0" step="0.01">
+            ${datalistHTML}
+            <input type="text" class="person-name" placeholder="Person name" list="${datalistId}" required>
+            <input type="number" class="person-amount" placeholder="Amount" min="0" step="1">
             <button class="remove-btn" data-id="${personId}"><i class="fas fa-times"></i></button>
         `;
         peopleContainer.appendChild(personDiv);
@@ -39,8 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add remove functionality
         personDiv.querySelector('.remove-btn').addEventListener('click', function() {
             peopleContainer.removeChild(personDiv);
+            calculateTotalBill(); // Recalculate when removing people
         });
+        
+        // Add event listener to recalculate when amounts change
+        personDiv.querySelector('.person-amount').addEventListener('input', calculateTotalBill);
     });
+
 
     // Calculate button click
     calculateBtn.addEventListener('click', calculateSplit);
@@ -56,9 +75,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const fieldId = Date.now();
         const fieldDiv = document.createElement('div');
         fieldDiv.className = `${type}-item`;
+        
+        // Create datalist for suggestions
+        const datalistId = `${type}-suggestions-${fieldId}`;
+        const suggestions = type === 'discount' ? commonDiscounts : 
+                        type === 'extra' ? commonExtras : [];
+        
+        let datalistHTML = '';
+        if (suggestions.length > 0) {
+            datalistHTML = `<datalist id="${datalistId}">`;
+            suggestions.forEach(suggestion => {
+                datalistHTML += `<option value="${suggestion}">`;
+            });
+            datalistHTML += '</datalist>';
+        }
+        
         fieldDiv.innerHTML = `
-            <input type="text" class="${type}-desc" placeholder="${label} description">
-            <input type="number" class="${type}-amount" placeholder="Amount" min="0" step="0.01">
+            ${datalistHTML}
+            <input type="text" class="${type}-desc" placeholder="${label} description" list="${datalistId}">
+            <input type="number" class="${type}-amount" placeholder="Amount" min="0" step="1">
             <button class="remove-btn" data-id="${fieldId}"><i class="fas fa-times"></i></button>
         `;
         container.appendChild(fieldDiv);
@@ -66,12 +101,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add remove functionality
         fieldDiv.querySelector('.remove-btn').addEventListener('click', function() {
             container.removeChild(fieldDiv);
+            calculateTotalBill(); // Recalculate when removing items
         });
+        
+        // Add event listener to recalculate when amounts change
+        fieldDiv.querySelector(`.${type}-amount`).addEventListener('input', calculateTotalBill);
     }
 
     // Main calculation function
     function calculateSplit() {
-        const totalBill = parseFloat(totalBillInput.value) || 0;
+        const totalBill = calculateTotalBill();
         
         // Get all discounts
         const discountElements = discountsContainer.querySelectorAll('.discount-item');
@@ -126,11 +165,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Display results
-        displayResults(totalBill, totalDiscount, totalExtra, adjustedTotal, peopleWithShares);
+        displayResults(totalDiscount, totalExtra, adjustedTotal, peopleWithShares);
+        // Reset input fields
+    }
+
+    function calculateTotalBill() {
+        let total = 0;
+        
+        // Sum all person amounts
+        const personElements = peopleContainer.querySelectorAll('.person-item');
+        personElements.forEach(person => {
+            const amount = parseFloat(person.querySelector('.person-amount').value) || 0;
+            total += amount;
+        });
+        
+        // Display the calculated total
+        if (total > 0) {
+            document.getElementById('totalBillDisplay').textContent = formatRupiah(total);
+        } else {
+            document.getElementById('totalBillDisplay').textContent = 'Rp0';
+        }
+        
+        return total;
+    }
+
+    function formatRupiah(amount) {
+        return 'Rp' + amount.toLocaleString('id-ID');
     }
 
     // Display results function
-    function displayResults(totalBill, totalDiscount, totalExtra, adjustedTotal, people) {
+    function displayResults(totalDiscount, totalExtra, adjustedTotal, people) {
         // Show results section
         resultsSection.style.display = 'block';
         
@@ -141,20 +205,20 @@ document.addEventListener('DOMContentLoaded', function() {
         let summaryHTML = `
             <div class="summary-card">
                 <div class="summary-item">
-                    <span>Original Bill:</span>
-                    <span>$${totalBill.toFixed(2)}</span>
+                    <span>Total Kontribusi:</span>
+                    <span>${formatRupiah(calculateTotalBill())}</span>
                 </div>
                 <div class="summary-item">
-                    <span>Total Discounts:</span>
-                    <span>-$${totalDiscount.toFixed(2)}</span>
+                    <span>Total Diskon:</span>
+                    <span>-${formatRupiah(totalDiscount)}</span>
                 </div>
                 <div class="summary-item">
-                    <span>Total Extras:</span>
-                    <span>+$${totalExtra.toFixed(2)}</span>
+                    <span>Total Tambahan:</span>
+                    <span>+${formatRupiah(totalExtra)}</span>
                 </div>
                 <div class="summary-item total">
-                    <span>Total to Split:</span>
-                    <span>$${adjustedTotal.toFixed(2)}</span>
+                    <span>Total Dibayar:</span>
+                    <span>${formatRupiah(adjustedTotal)}</span>
                 </div>
             </div>
         `;
@@ -168,12 +232,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="person-card">
                     <h3><i class="fas fa-user"></i> ${person.name}</h3>
                     <div class="person-detail">
-                        <span>Contribution:</span>
-                        <span>$${person.amount.toFixed(2)} (${person.percentage}%)</span>
+                        <span>Kontribusi:</span>
+                        <span>${formatRupiah(person.amount)} (${person.percentage}%)</span>
                     </div>
                     <div class="person-detail">
-                        <span>Owes:</span>
-                        <span>$${person.share.toFixed(2)}</span>
+                        <span>Harus Bayar:</span>
+                        <span>${formatRupiah(person.share)}</span>
                     </div>
                 </div>
             `;

@@ -211,6 +211,14 @@ input[type="number"]:focus {
     color: var(--primary-color);
 }
 
+.summary-item span:first-child {
+    color: #666;
+}
+
+.summary-item span:last-child {
+    font-weight: 500;
+}
+
 .person-card {
     background-color: #f8f9fa;
     border-radius: var(--border-radius);
@@ -255,4 +263,21 @@ footer i {
         margin-right: 0;
         margin-bottom: 10px;
     }
+}
+
+.total-display {
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    text-align: right;
+}
+
+input[list] {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236c63ff" viewBox="0 0 16 16"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px 12px;
+    padding-right: 30px;
 }

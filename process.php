@@ -118,7 +118,16 @@ try {
     $logMessage = json_encode($logData) . PHP_EOL;
     file_put_contents('logs/bill_logs.txt', $logMessage, FILE_APPEND);
 
-    echo json_encode(['success' => true, 'message' => 'Calculation saved successfully']);
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Calculation saved successfully',
+        'formatted' => [
+            'total' => 'Rp' . number_format($finalTotal, 0, ',', '.'),
+            'discount' => 'Rp' . number_format($totalDiscount, 0, ',', '.'),
+            'extra' => 'Rp' . number_format($totalExtra, 0, ',', '.')
+        ]
+    ]);
+
 } catch (Exception $e) {
     $conn->rollback();
     echo json_encode(['success' => false, 'message' => 'Error saving calculation: ' . $e->getMessage()]);

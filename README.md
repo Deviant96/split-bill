@@ -32,3 +32,11 @@ A simple web application to split bills among friends with discounts and extra e
 4. Add all people sharing the bill
 5. Click "Calculate Split" to see the results
 6. Save the calculation if desired
+
+## Updates
+
+### Update 1
+   1. Automatically calculate total based on person contributions
+   2. Show all ammounts in proper Rupiah format
+   3. Provide suggestions for common discount types, extra expenses, and people names
+   4. Display all text in Bahasa
